@@ -1,56 +1,32 @@
-# -*- coding: utf-8 -*-
-from collections import Counter
 import csv
 import json
 import pickle
 import string
 
-
 def main(filename):
-    # declare a word list
+    txtfile = open(filename)
+    lines = txtfile.readlines()
     all_words = []
-
-    # extract all words from lines
-    for line in open(filename):
+    for line in lines:
         line = line.strip()
-        if not line:
-            continue
-        # split a line of text into a list words
-        # "I have a dream." => ["I", "have", "a", "dream."]
-        # check the format of words and append it to "all_words" list
-        for word in line.split():
-            # then, remove (strip) unwanted punctuations from every word
-            # "dream." => "dream"
+        words = line.split()
+        for word in words:
             word = word.strip(string.punctuation)
-            # check if word is not empty
-            if word:
-                # append the word to "all_words" list
+            if word != ("" ""):
                 all_words.append(word)
+    from collections import Counter
+    counter = Counter()
+    counter.update(all_words)
 
-    # compute word count from all_words
-    counter = Counter(all_words)
-
-    # dump to a csv file named "wordcount.csv":
-    # word,count
-    # the,101
-    # of,99
-    # to,59
-    # ...
     with open("wordcount.csv", "w") as csv_file:
-        # create a csv writer from a file object (or descriptor)
-        writer = csv.writer(csv_file)
-        # write table head
+        writer = csv.writer(csv_file, delimiter=",")
         writer.writerow(['word', 'count'])
-        # write all (word, count) pair into the csv writer
-        writer.writerows(counter.most_common())
-
-    # dump to a json file named "wordcount.json"
-    json.dump(list(counter.most_common()), open("wordcount.json", "w"))
-
-    # BONUS: dump to a pickle file named "wordcount.pkl"
-    # hint: dump the Counter object directly
-    pickle.dump(counter, open("wordcount.pkl", "wb"))
-
+        for f in set(all_words):
+            writer.writerow([f,all_words.count(f)])
+    with open("wordcount.json", "w") as json_file:
+        json.dump(counter, json_file)
+    with open("wordcount.pkl", "wb") as pkl_file:
+        pickle.dump(counter, pkl_file)
 
 if __name__ == '__main__':
-main("i_have_a_dream.txt")
+    main("i_have_a_dream.txt")
